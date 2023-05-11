@@ -1,77 +1,109 @@
-const Author = require("./model")
+const db = require('../models')
+const Author = db.Author
 
 const addAuthor = async (req, res) => {
-    try {
-        const newAuthor = await Author.create ({
-            name: req.body.name,
-            publisher: req.body.publisher
-        })
-        
-        res.status(201).json ({
-            message: "Author successfully created!",
-            book: newAuthor
-        })
-    } catch (error) {
-        console.log(error)
-    }
+  try {
+    const newAuthor = await Author.create({
+      name: req.body.name,
+      publisher: req.body.publisher
+    })
+
+    res.status(201).json({
+      message: 'Author successfully created!',
+      author: newAuthor
+    })
+  } catch (error) {
+    console.log(error)
+  }
 }
 
-const allAuthors = async (req, res) => {
-    try {
-        const findAuthors = await Author.findAll() // locates book user wanted to find
-        
-        res.status(200).json ({
-            message: "Authors successfully found!",
-            book: findAuthors
-        })
-    } catch (error) {
-        res.status(501).json({ errorMessage: error.message, error: error });
-        console.log(error)
-    }
+const getAllAuthors = async (req, res) => {
+  try {
+    const authors = await Author.findAll()
+
+    res.status(200).json({
+      message: 'Authors successfully found!',
+      authors: authors
+    })
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 const updateAuthor = async (req, res) => {
-    try {
-        const update = await Author.update({
-            author: req.body.newAuthor
-        },
-        {
-            where: {
-                title: req.body.title
-            }
-        })
+  try {
+    const author = await Author.findOne({
+      where: {
+        id: req.params.id
+      }
+    })
 
-        res.status(200).json ({
-            message: "Book successfully updated!",
-            updateResult: update
-        })
-    } catch {
-        res.status(501).json({ errorMessage: error.message, error: error });
-        console.log(error)
+    if (!author) {
+      res.status(404).json({
+        message: 'Author not found!'
+      })
+      return
     }
+
+    await author.update({
+      name: req.body.name || author.name,
+      publisher: req.body.publisher || author.publisher
+    })
+
+    res.status(200).json({
+      message: 'Author successfully updated!',
+      author: author
+    })
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 const deleteAuthor = async (req, res) => {
-    try {
-        const deleteAuthor = await Author.destroy({
-            where: {
-                name: req.body.name
-            }
-        })
+  try {
+    const author = await Author.findOne({
+      where: {
+        id: req.params.id
+      }
+    })
 
-        res.status(200).json ({
-            message: "Book successfully deleted!",
-            book: deleteBook
-        })
-    } catch {
-        res.status(501).json({ errorMessage: error.message, error: error });
-        console.log(error)
+    if (!author) {
+      res.status(404).json({
+        message: 'Author not found!'
+      })
+      return
     }
+
+    await author.destroy()
+
+    res.status(200).json({
+      message: 'Author successfully deleted!',
+      author: author
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const deleteAllAuthors = async (req, res) => {
+  try {
+    await Author.destroy({
+      where: {},
+      truncate: true
+    })
+
+    res.status(200).json({
+      message: 'All authors successfully deleted!'
+    })
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 module.exports = {
-    addAuthor,
-    allAuthors,
-    updateAuthor,
-    deleteAuthor
+  addAuthor,
+  getAllAuthors,
+  updateAuthor,
+  deleteAuthor,
+  deleteAllAuthors
 }
