@@ -1,12 +1,12 @@
 const { DataTypes } = require("sequelize")
 const connection = require("../db/connection.js") // import and run the connection files
 const Author = connection.define("Author", {
-    Name: {
+    name: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
     },
-    Publisher: {
+    publisher: {
         type: DataTypes.STRING
     }
 })

@@ -1,5 +1,4 @@
-const db = require('../models')
-const Author = db.Author
+const Author = require('./model');
 
 const addAuthor = async (req, res) => {
   try {
@@ -31,24 +30,24 @@ const getAllAuthors = async (req, res) => {
 }
 
 const updateAuthor = async (req, res) => {
+  console.log(req.body.name)
   try {
-    const author = await Author.findOne({
-      where: {
-        id: req.params.id
+    const author = await Author.update({
+        publisher: req.body.newPublisher
+    }, 
+    {
+        where: {
+          name: req.body.name
       }
     })
+    console.log(author)
 
-    if (!author) {
+    if (author != 1) {
       res.status(404).json({
-        message: 'Author not found!'
+        message: 'Author not found/updated!'
       })
       return
     }
-
-    await author.update({
-      name: req.body.name || author.name,
-      publisher: req.body.publisher || author.publisher
-    })
 
     res.status(200).json({
       message: 'Author successfully updated!',
@@ -61,9 +60,10 @@ const updateAuthor = async (req, res) => {
 
 const deleteAuthor = async (req, res) => {
   try {
+    console.log(req.body.name)
     const author = await Author.findOne({
       where: {
-        id: req.params.id
+        name: req.body.name
       }
     })
 
